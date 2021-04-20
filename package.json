@@ -10,9 +10,13 @@
     "@slack/web-api": "^6.2.0-rc.0",
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.6",
+    "dotenv": "^8.2.0",
+    "form-data": "^4.0.0",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
-    "koa-router": "^10.0.0"
+    "koa-request": "^1.0.0",
+    "koa-router": "^10.0.0",
+    "qs": "^6.10.1"
   },
   "devDependencies": {
     "@types/koa": "^2.13.1",
@@ -23,6 +27,8 @@
     "typescript": "^4.2.4"
   },
   "scripts": {
-    "start:dev": "nodemon --watch 'src/**/*' -e ts --exec ts-node ./src/index.ts"
+    "start": "node dist/src/",
+    "start:dev": "nodemon --watch 'src/**/*' -e ts --exec ts-node ./src/index.ts",
+    "deploy": "git add . && git commit -m 'deploy' && git push heroku master"
   }
 }
