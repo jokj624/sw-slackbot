@@ -9,7 +9,8 @@ export const crawling = async () => {
     $bodyList.each((i : any, elem: any) => {
         textList[i] = {
             title: $(elem).find('div.artclTitle strong').text(),
-            urlInfo: "https://software.sookmyung.ac.kr"+ $(elem).attr('href')
+            urlInfo: "https://software.sookmyung.ac.kr"+ $(elem).attr('href'),
+            date: $(elem).find('dl._artclregDate dd').text().trim()
         };
     }); 
     return textList;

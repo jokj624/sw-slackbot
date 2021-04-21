@@ -56,26 +56,66 @@ api.post('/slack/events', async(ctx : { body: any , status: number, request: any
 api.post('/slack/events/command', async (ctx : { body: any , status: number, request: any}) => {
     const body : any = ctx.request.body;
     if (body.token === verification) {
-        web = new WebClient(oauthToken);
+        web = new WebClient(oauthToken);    //user token 받아와서 사용
+        let textBlock : any[];  //전송 메시지 담을 배열
         const textResult = await crawling();
-        let textBlock: any[] = [{type:"section", text:{type:"mrkdwn", text: "소프트웨어학부 취업 공지사항 입니다."}}];
-        textResult.map((item: any) => {
-            const obj : any = {
-                type: "section", 
-                text: {
-                    type:"mrkdwn",
-                    text: "*"+ item.title + "*\n" + item.urlInfo
+        textBlock = [{type:"section", text:{type:"mrkdwn", text: "소프트웨어학부 취업 공지사항 입니다."}}];
+        if(body.text === ''){
+            //최근 페이지 공지 모두 전송
+            textResult.map((item: any) => {
+                const obj : any = {
+                    type: "section", 
+                    text: {
+                        type:"mrkdwn",
+                        text: "*"+ item.title + "*\n" + item.urlInfo
+                    }
+                };
+                const divider : any = { type: "divider" };  //섹션 나누기용
+                textBlock.push(obj);
+                textBlock.push(divider);
+            });
+            web.chat.postMessage({
+                channel: body.channel_id,
+                blocks: textBlock
+            });
+        } else if(body.text === '오늘'){
+            //오늘 게시물 전송
+            const today : any = new Date();
+            const year : number = today.getFullYear();
+            const month : number = today.getMonth()+1;
+            const date : number  = today.getDate();
+            let todayStr : string = ''; 
+            let cnt : number = 0;   //오늘 게시글 개수 확인 용
+            if(month == 11 || month == 12) {
+                todayStr = `${year}.${month}.${date}`; 
+            } else {
+                todayStr = `${year}.0${month}.${date}`;     //month 가 한자리수면 0 붙인다.
+            }
+            console.log(todayStr);
+            textResult.map((item: any) => {
+                if(item.date === todayStr){
+                    const obj : any = {
+                        type: "section", 
+                        text: {
+                            type:"mrkdwn",
+                            text: "*"+ item.title + "*\n" + item.urlInfo
+                        }
+                    };
+                    const divider : any = { type: "divider" };
+                    textBlock.push(obj);
+                    textBlock.push(divider);
+                    cnt += 1;
                 }
-            };
-            const divider : any = { type: "divider" };
-            textBlock.push(obj);
-            textBlock.push(divider);
-        });
-        web.chat.postMessage({
-            channel: body.channel_id,
-            blocks: textBlock
-        });
-        ctx.body = body.text;
+            });
+            if(cnt == 0) {
+                textBlock[0].text.text = "오늘 올라온 게시글이 없습니다.";  
+            }
+            web.chat.postMessage({
+                channel: body.channel_id,
+                blocks: textBlock
+            });
+        }
+        ctx.body = textBlock[0].text.text;  //미리보기 메시지
         ctx.status = 200;
     }
 });
