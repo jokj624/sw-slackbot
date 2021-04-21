@@ -1,5 +1,5 @@
 # sw-slackbot
-<a href="https://slack.com/oauth/v2/authorize?client_id=1988645441393.1976247942707&scope=channels:history,im:history,chat:write,commands&user_scope=chat:write"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
+
 
 ### 🤖 숙명여자대학교 소프트웨어학부 홈페이지 내 취업 공지 게시글을 가져오는 Slack App   
 
