@@ -1,5 +1,5 @@
-const Koa = require('koa');
-const Router = require('koa-router');
+import Koa from 'koa';
+import Router from 'koa-router';
 const bodyParser = require('koa-bodyparser');
 const api = require('./api');
 const mongoose = require('mongoose');
@@ -15,9 +15,9 @@ mongoose
     console.error(e);
 });
 
-const app = new Koa();
-const router = new Router();
-const port: any = process.env.PORT || 5000;
+const app: Koa = new Koa();
+const router: Router = new Router();
+const port: number = Number(process.env.PORT) || 5000;
 
 app.use(bodyParser());
 
