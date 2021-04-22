@@ -4,8 +4,8 @@
 ### 🤖 숙명여자대학교 소프트웨어학부 홈페이지 내 취업 공지 게시글을 가져오는 Slack App   
 
 * 워크 스페이스에 추가는 아래 버튼을 클릭하세요.  
-* 본 App 은 Public 채널, App과의 개별 사용자 DM에서만 작동합니다.   
-
+* 본 App 추가 후 사용하고자 하는 채널에서 앱 추가 해주시면 됩니다.   
+* App과 개별 DM으로도 사용 가능합니다.   
 <a href="https://slack.com/oauth/v2/authorize?client_id=1988645441393.1976247942707&scope=channels:history,im:history,chat:write,commands&user_scope=chat:write"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>
 
 #### Slash Command   
