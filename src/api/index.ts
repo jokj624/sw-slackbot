@@ -1,3 +1,4 @@
+import Koa from 'koa';
 import { WebClient } from '@slack/web-api';
 import Router from 'koa-router';
 import CONFIG from '../../config/bot.json';
@@ -8,9 +9,9 @@ const verification : string = CONFIG.VERIFICATION_TOKEN;   //개발용 token
 const clientId : string = process.env.SLACK_CLIENT_ID || '';
 const clientSecret : string = process.env.SLACK_CLIENT_SECRET || '';  //환경 변수 bot client 정보
 const axios = require("axios");
-const api = new Router();
+const api: Router = new Router();
 
-api.get('/auth', async (ctx : { body: any , status: number, request: any, query: any}) => {
+api.get('/auth', async (ctx: Koa.Context) => {
     if(!ctx.query.code){
         return; //접근 거부
     }
@@ -47,40 +48,46 @@ api.get('/auth', async (ctx : { body: any , status: number, request: any, query:
     }
 });
 
-api.post('/slack/events', async(ctx : { body: any , status: number, request: any}) => {
+api.post('/slack/events', async(ctx: Koa.Context) => {
     const body : any = ctx.request.body;
     if(body.type === 'url_verification'){
         //url 검증
         ctx.body = body.challenge;
+        ctx.status = 200;
     } else if(body.type === 'event_callback') {
-            ctx.body = '';
-            ctx.status = 200;
+        ctx.body = body;
+        ctx.status = 200;
     } else {
         ctx.status = 200;
     }
 });
-api.post('/slack/events/command', async (ctx : { body: any , status: number, request: any}) => {
-    const body : any = ctx.request.body;
-    console.log(body);
+api.post('/slack/events/command', async(ctx: Koa.Context)  => {
+    const body = ctx.request.body;
     if (body.token === verification) {
         const id : string = body.team_id;
-        const team : any = await Team.findOne({ team_id: id });
+        let result = await Promise.all([
+           new Promise(resolve => resolve(Team.findOne({ team_id: id }))),
+           crawling() 
+        ]); //크롤링, db에서 토큰 꺼내오기 병렬 처리
+        const team : any = result[0];
+        const textResult = result[1];
         if(team) { 
+            ctx.body='';
+            ctx.status = 200;
             const web = new WebClient(team.access_token);
             let textBlock : any[];
-            const textResult = await crawling();
             textBlock = [{type:"section", text:{type:"mrkdwn", text: "소프트웨어학부 취업 공지사항 입니다."}}];
             if(body.text === ''){
                 //최근 페이지 공지 모두 전송
                 textResult.map((item: any) => {
-                    const obj : any = {
+                    const obj: any = {
                         type: "section", 
                         text: {
                             type:"mrkdwn",
                             text: "*"+ item.title + "*\n" + item.urlInfo
                         }
                     };
-                    const divider : any = { type: "divider" };
+                    const divider = { type: "divider" };
                     textBlock.push(obj);
                     textBlock.push(divider);
                 });
@@ -125,13 +132,18 @@ api.post('/slack/events/command', async (ctx : { body: any , status: number, req
                     blocks: textBlock
                 });
             }
-            ctx.body = textBlock[0].text.text;
-            ctx.status = 200;
         } else {
+            ctx.body = '오류 발생';
             ctx.status = 404;
+            return;
         }
-        
+        axios.post(body.response_url, {text: '가끔 서버가 느려 slack bot이 time out 에러를 보낼 수 있어요. 무시해도 좋아요'});
+    } else {
+        ctx.body = '오류 발생';
+        ctx.status = 404;
+        return;
     }
 });
 
 module.exports = api;
+
