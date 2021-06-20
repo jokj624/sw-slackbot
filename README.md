@@ -51,6 +51,6 @@
     "@types/koa-router": "^7.4.2",
     "nodemon": "^2.0.7",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4" 
   }
   ```
